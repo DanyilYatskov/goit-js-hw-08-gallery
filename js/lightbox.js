@@ -33,16 +33,23 @@ function onGalleryClick(event) {
   if (event.target.nodeName !== 'IMG') {
     return;
   }
+  window.addEventListener('keydown', onEscPress);
   refs.lightboxImg.src = event.target.dataset.source;
   refs.lightbox.classList.add('is-open');
 }
-function onCloseLightbox(event) {
+function onCloseLightbox() {
   refs.lightboxImg.src = '';
   refs.lightbox.classList.remove('is-open');
+  window.removeEventListener('keydown', onEscPress);
 }
 function onOverlayClick(event) {
   if (event.target.classList.contains('lightbox__overlay')) {
     onCloseLightbox(event);
+  }
+}
+function onEscPress(event) {
+  if (event.code === 'Escape') {
+    onCloseLightbox();
   }
 }
 createGallery(imagesDataArray);
