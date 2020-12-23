@@ -44,7 +44,7 @@ function onCloseLightbox() {
 }
 function onOverlayClick(event) {
   if (event.target.classList.contains('lightbox__overlay')) {
-    onCloseLightbox(event);
+    onCloseLightbox();
   }
 }
 function onEscPress(event) {
