@@ -7,6 +7,7 @@ const refs = {
   ),
   lightboxImg: document.querySelector('.js-lightbox .lightbox__image'),
 };
+var originalImgUrlArray = [];
 function addGalleryItem(image) {
   const galleryItem = document.createElement('li');
   const galleryLink = document.createElement('a');
@@ -15,17 +16,16 @@ function addGalleryItem(image) {
   galleryImage.src = image.preview;
   galleryImage.dataset.source = image.original;
   galleryImage.alt = image.description;
+  originalImgUrlArray.push(image.original);
   galleryLink.appendChild(galleryImage);
   galleryLink.classList.add('gallery__link');
   galleryLink.href = image.original;
   galleryItem.appendChild(galleryLink);
   galleryItem.classList.add('gallery__item');
-  //console.log(galleryItem);
   return galleryItem;
 }
 function createGallery(images) {
   var galleryToCreate = images.map(image => addGalleryItem(image));
-  //console.log(galleryToCreate);
   refs.gallery.append(...galleryToCreate);
 }
 function onGalleryClick(event) {
@@ -33,14 +33,17 @@ function onGalleryClick(event) {
   if (event.target.nodeName !== 'IMG') {
     return;
   }
-  window.addEventListener('keydown', onEscPress);
+
   refs.lightboxImg.src = event.target.dataset.source;
   refs.lightbox.classList.add('is-open');
+  window.addEventListener('keydown', onEscPress);
+  window.addEventListener('keydown', onKeyLeftRightPress);
 }
 function onCloseLightbox() {
   refs.lightboxImg.src = '';
   refs.lightbox.classList.remove('is-open');
   window.removeEventListener('keydown', onEscPress);
+  window.removeEventListener('keydown', onKeyLeftRightPress);
 }
 function onOverlayClick(event) {
   if (event.target.classList.contains('lightbox__overlay')) {
@@ -50,6 +53,20 @@ function onOverlayClick(event) {
 function onEscPress(event) {
   if (event.code === 'Escape') {
     onCloseLightbox();
+  }
+}
+function onKeyLeftRightPress(event) {
+  const currentImgIndx = originalImgUrlArray.indexOf(refs.lightboxImg.src);
+  if (event.keyCode === 39) {
+    refs.lightboxImg.src =
+      currentImgIndx >= originalImgUrlArray.length - 1
+        ? originalImgUrlArray[0]
+        : originalImgUrlArray[currentImgIndx + 1];
+  } else if (event.keyCode === 37) {
+    refs.lightboxImg.src =
+      currentImgIndx <= 0
+        ? originalImgUrlArray[originalImgUrlArray.length - 1]
+        : originalImgUrlArray[currentImgIndx - 1];
   }
 }
 createGallery(imagesDataArray);
