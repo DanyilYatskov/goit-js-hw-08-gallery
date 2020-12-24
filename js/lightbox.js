@@ -7,7 +7,8 @@ const refs = {
   ),
   lightboxImg: document.querySelector('.js-lightbox .lightbox__image'),
 };
-var originalImgUrlArray = [];
+let originalImgUrlArray = [];
+let currentImgIndx = 0;
 function addGalleryItem(image) {
   const galleryItem = document.createElement('li');
   const galleryLink = document.createElement('a');
@@ -25,7 +26,7 @@ function addGalleryItem(image) {
   return galleryItem;
 }
 function createGallery(images) {
-  var galleryToCreate = images.map(image => addGalleryItem(image));
+  let galleryToCreate = images.map(image => addGalleryItem(image));
   refs.gallery.append(...galleryToCreate);
 }
 function onGalleryClick(event) {
@@ -37,13 +38,15 @@ function onGalleryClick(event) {
   refs.lightboxImg.src = event.target.dataset.source;
   refs.lightbox.classList.add('is-open');
   window.addEventListener('keydown', onEscPress);
-  window.addEventListener('keydown', onKeyLeftRightPress);
+  window.addEventListener('keydown', onArrowLeftPress);
+  window.addEventListener('keydown', onArrowRightPress);
 }
 function onCloseLightbox() {
   refs.lightboxImg.src = '';
   refs.lightbox.classList.remove('is-open');
   window.removeEventListener('keydown', onEscPress);
-  window.removeEventListener('keydown', onKeyLeftRightPress);
+  window.removeEventListener('keydown', onArrowLeftPress);
+  window.removeEventListener('keydown', onArrowRightPress);
 }
 function onOverlayClick(event) {
   if (event.target.classList.contains('lightbox__overlay')) {
@@ -55,18 +58,22 @@ function onEscPress(event) {
     onCloseLightbox();
   }
 }
-function onKeyLeftRightPress(event) {
-  const currentImgIndx = originalImgUrlArray.indexOf(refs.lightboxImg.src);
+function onArrowLeftPress(event) {
+  currentImgIndx = originalImgUrlArray.indexOf(refs.lightboxImg.src);
+  if (event.keyCode === 37) {
+    refs.lightboxImg.src =
+      currentImgIndx <= 0
+        ? originalImgUrlArray[originalImgUrlArray.length - 1]
+        : originalImgUrlArray[currentImgIndx - 1];
+  }
+}
+function onArrowRightPress(event) {
+  currentImgIndx = originalImgUrlArray.indexOf(refs.lightboxImg.src);
   if (event.keyCode === 39) {
     refs.lightboxImg.src =
       currentImgIndx >= originalImgUrlArray.length - 1
         ? originalImgUrlArray[0]
         : originalImgUrlArray[currentImgIndx + 1];
-  } else if (event.keyCode === 37) {
-    refs.lightboxImg.src =
-      currentImgIndx <= 0
-        ? originalImgUrlArray[originalImgUrlArray.length - 1]
-        : originalImgUrlArray[currentImgIndx - 1];
   }
 }
 createGallery(imagesDataArray);
